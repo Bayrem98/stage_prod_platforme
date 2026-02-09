@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Ajouter une Transaction{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Ajouter une Transaction
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'finance:cash_register' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Mettre à jour dynamiquement les catégories selon le type de transaction
+document.getElementById('id_transaction_type').addEventListener('change', function() {
+    const transactionType = this.value;
+    const categorySelect = document.getElementById('id_category');
+    
+    // Si vous avez un endpoint AJAX pour filtrer les catégories
+    // Sinon, vous pouvez recharger la page avec le filtre
+    window.location.href = "{% url 'finance:add_transaction' %}?type=" + transactionType;
+});
+</script>
+{% endblock %}

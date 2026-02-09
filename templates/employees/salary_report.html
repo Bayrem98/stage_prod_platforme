@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Rapport des Salaires{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-graph-up"></i> Rapport des Salaires</h1>
+        <div>
+            <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <button class="btn btn-primary ms-2" onclick="window.print()">
+                <i class="bi bi-printer"></i> Imprimer
+            </button>
+        </div>
+    </div>
+    
+    <!-- Totaux -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Salaire Total</h5>
+                    <p class="card-text display-6">{{ total_base_salary|floatformat:2 }}  TND</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Avances Total</h5>
+                    <p class="card-text display-6">{{ total_advances|floatformat:2 }}  TND</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Salaire Net Total</h5>
+                    <p class="card-text display-6">{{ total_net_salary|floatformat:2 }}  TND</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Par département -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-building"></i> Salaires par Département</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Département</th>
+                            <th>Nombre d'employés</th>
+                            <th>Salaire Total</th>
+                            <th>Avances</th>
+                            <th>Salaire Net</th>
+                            <th>Salaire Moyen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in dept_stats %}
+                        <tr>
+                            <td>{{ stat.department.name }}</td>
+                            <td>{{ stat.count }}</td>
+                            <td>{{ stat.total_salary|floatformat:2 }}  TND</td>
+                            <td>{{ stat.total_advances|floatformat:2 }} TND</td>
+                            <td>{{ stat.total_salary|add:stat.total_advances|floatformat:2 }} TND</td>
+                            <td>{{ stat.avg_salary|floatformat:2 }} TND</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Liste détaillée -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-list-check"></i> Détail des Salaires</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Employé</th>
+                            <th>Département</th>
+                            <th>Salaire Base</th>
+                            <th>Avance</th>
+                            <th>Salaire Net</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr>
+                            <td>
+                                <strong>{{ employee.full_name }}</strong><br>
+                                <small class="text-muted">{{ employee.employee_id }}</small>
+                            </td>
+                            <td>
+                                {% if employee.department %}
+                                    {{ employee.department.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ employee.salary|floatformat:2 }}  TND</td>
+                            <td>
+                                {% if employee.salary_advance > 0 %}
+                                    <span class="text-warning">{{ employee.salary_advance|floatformat:2 }}  TND</span>
+                                {% else %}
+                                    0 TND
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong class="text-success">{{ employee.net_salary|floatformat:2 }}  TND</strong>
+                            </td>
+                            <td>
+                                {% if employee.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactif</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

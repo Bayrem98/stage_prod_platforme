@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails de {{ employee.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="bi bi-person-badge"></i> 
+            Fiche Employé: {{ employee.full_name }}
+        </h1>
+        <div>
+            <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+            <a href="/admin/employees/employee/{{ employee.id }}/change/" class="btn btn-warning ms-2">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Carte profil -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle" style="font-size: 100px; color: #6c757d;"></i>
+                    </div>
+                    <h4>{{ employee.full_name }}</h4>
+                    <p class="text-muted">{{ employee.position }}</p>
+                    
+                    <div class="mt-3">
+                        {% if employee.is_active %}
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-check-circle"></i> Actif
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger fs-6">
+                                <i class="bi bi-x-circle"></i> Inactif
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-start">
+                        <p><strong>Matricule:</strong> {{ employee.employee_id }}</p>
+                        <p><strong>CIN:</strong> {{ employee.cin }}</p>
+                        <p><strong>Date d'embauche:</strong> {{ employee.hire_date }}</p>
+                        <p><strong>Type de contrat:</strong> {{ employee.get_contract_type_display }}</p>
+                        {% if employee.department %}
+                            <p><strong>Département:</strong> {{ employee.department.name }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carte salaire -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Informations Salariales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Salaire de base</h6>
+                        <h3 class="text-primary">{{ employee.salary|floatformat:2 }}  TND</h3>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Avance sur salaire</h6>
+                        <h4 class="text-warning">{{ employee.salary_advance|floatformat:2 }}  TND</h4>
+                        {% if employee.advance_date %}
+                            <small class="text-muted">Date: {{ employee.advance_date }}</small><br>
+                        {% endif %}
+                        {% if employee.advance_reason %}
+                            <small class="text-muted">Motif: {{ employee.advance_reason }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div>
+                        <h6>Salaire net</h6>
+                        <h2 class="text-success">{{ employee.net_salary|floatformat:2 }}  TND</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informations détaillées -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations Personnelles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Coordonnées</h6>
+                            <p><strong>Adresse:</strong><br>{{ employee.address|linebreaks }}</p>
+                            <p><strong>Téléphone:</strong> {{ employee.personal_phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Informations complémentaires</h6>
+                            <p><strong>Date d'embauche:</strong> {{ employee.hire_date }}</p>
+                            <p><strong>Type de contrat:</strong> {{ employee.get_contract_type_display }}</p>
+                            {% if employee.contract_end_date %}
+                                <p><strong>Fin de contrat:</strong> {{ employee.contract_end_date }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informations bancaires -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bank"></i> Informations Bancaires</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nom de la banque:</strong> {{ employee.bank_name }}</p>
+                            <p><strong>Numéro de compte:</strong> {{ employee.bank_account }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>RIB:</strong> {{ employee.rib }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="/admin/employees/employee/{{ employee.id }}/change/" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Modifier l'employé
+                        </a>
+                        <a href="/admin/employees/employee/{{ employee.id }}/delete/" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer l'employé
+                        </a>
+                        <button class="btn btn-info" onclick="window.print()">
+                            <i class="bi bi-printer"></i> Imprimer la fiche
+                        </button>
+                        <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-list-ul"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        border-bottom: 2px solid #f0f0f0;
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

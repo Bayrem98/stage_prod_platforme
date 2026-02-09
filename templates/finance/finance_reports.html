@@ -1,0 +1,128 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Rapports
+Financiers{% endblock %} {% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Rapports Financiers</h1>
+
+  <!-- Balance générale -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-white bg-success">
+        <div class="card-body">
+          <h5 class="card-title">Total Recettes</h5>
+          <h3 class="card-text">{{ total_income_all|floatformat:2 }} DT</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <h5 class="card-title">Total Dépenses</h5>
+          <h3 class="card-text">{{ total_expense_all|floatformat:2 }} DT</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div
+        class="card text-white {% if net_balance >= 0 %}bg-primary{% else %}bg-warning{% endif %}"
+      >
+        <div class="card-body">
+          <h5 class="card-title">Balance Nette</h5>
+          <h3 class="card-text">{{ net_balance|floatformat:2 }} DT</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques mensuelles -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Statistiques Mensuelles</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Mois</th>
+              <th>Nombre de transactions</th>
+              <th>Recettes</th>
+              <th>Dépenses</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stat in monthly_stats %}
+            <tr>
+              <td>{{ stat.month|date:"F Y" }}</td>
+              <td>{{ stat.count }}</td>
+              <td class="text-success">
+                {{ stat.total_income|default:0|floatformat:2 }} DT
+              </td>
+              <td class="text-danger">
+                {{ stat.total_expense|default:0|floatformat:2 }} DT
+              </td>
+              <td
+                class="{% if stat.total_income|default:0|add:stat.total_expense|default:0 >= 0 %}text-success{% else %}text-danger{% endif %}"
+              >
+                {{
+                stat.total_income|default:0|add:stat.total_expense|default:0|floatformat:2
+                }} DT
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">Aucune donnée disponible</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Par catégorie -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Par Catégorie</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Catégorie</th>
+              <th>Type</th>
+              <th>Nombre</th>
+              <th>Total</th>
+              <th>Moyenne</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stat in category_stats %}
+            <tr>
+              <td>{{ stat.category__name|default:"Non catégorisé" }}</td>
+              <td>
+                <span
+                  class="badge {% if stat.transaction_type in 'income,salary' %}bg-success{% else %}bg-danger{% endif %}"
+                >
+                  {{ stat.transaction_type|capfirst }}
+                </span>
+              </td>
+              <td>{{ stat.count }}</td>
+              <td>{{ stat.total|floatformat:2 }} DT</td>
+              <td>
+                {% if stat.count > 0 %}{{ stat.total|divisibleby:stat.count|default:0|floatformat:2 }} DT{% else %} 0.00 DT {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">Aucune donnée disponible</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
