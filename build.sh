@@ -5,8 +5,11 @@ echo "=== Installation des dépendances ==="
 pip install --upgrade pip
 pip install --no-cache-dir -r requirements.txt
 
+echo "=== Création des dossiers nécessaires ==="
+mkdir -p static staticfiles media
+
 echo "=== Collecte des fichiers statiques ==="
-python manage.py collectstatic --no-input
+python manage.py collectstatic --no-input --clear
 
 echo "=== Application des migrations ==="
 python manage.py makemigrations --noinput || echo "Aucune nouvelle migration"
@@ -24,11 +27,11 @@ try:
     
     if not User.objects.filter(username='admin').exists():
         User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-        print('Superutilisateur créé')
+        print('✓ Superutilisateur créé')
     else:
-        print('Superutilisateur existe déjà')
+        print('✓ Superutilisateur existe déjà')
 except Exception as e:
-    print(f'Erreur: {e}')
+    print(f'⚠️ Erreur création admin: {e}')
 "
 
 echo "=== Build réussi ==="
