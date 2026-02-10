@@ -11,7 +11,14 @@ SECRET_KEY = config('SECRET_KEY', default='1234567890abcdef')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# Définition correcte de ALLOWED_HOSTS
+ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
+
+# Pour le déploiement sur Render, ajoutez aussi le domaine Render
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('stage-prod-platforme.onrender.com')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 INSTALLED_APPS = [
@@ -121,3 +128,16 @@ AUTH_USER_MODEL = 'core.CustomUser'
 
 # WhiteNoise configuration (pour la production)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Security settings for production
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = [
+        'https://stage-prod-platforme.onrender.com',
+        'https://*.onrender.com'
+    ]
