@@ -12,7 +12,12 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee')
     phone = models.CharField(max_length=20, blank=True)
     department = models.CharField(max_length=100, blank=True)
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_picture = models.CharField(
+        max_length=500, 
+        blank=True, 
+        null=True,
+        verbose_name="Photo de profil (URL)"
+    )
     
     def __str__(self):
         return f"{self.username} - {self.get_role_display()}"
